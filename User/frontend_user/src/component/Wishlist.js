@@ -10,10 +10,16 @@ class Wishlist extends Component {
     datawishlist: []
   }
   componentWillMount = () => {
-    axios.get('http://localhost:8002/datawishlist').then((getData) => {
+    var id_user = cookies.get('login');
+    axios.post('http://localhost:8002/datawishlist',
+      {
+        id_user : id_user
+      }).then((getData) =>
+      
+      {
       console.log(getData.data)
       this.setState({
-        datawishlist: getData.data
+        datawishlist: getData.data,
       });
     });
     console.log(this.state.datawishlist)
@@ -56,7 +62,7 @@ class Wishlist extends Component {
           <div className="row">
             <div className="col-md-6">
               <div className="card">
-              <img className="card-img-top" src={'http://localhost:8002/tampungfile/'+fotowishlist} height={280} alt="Card image cap" />
+                <Link to= {{pathname: '/Product_detail/' + id, state: {id:id}}}><img className="card-img-top" src={'http://localhost:8002/tampungfile/'+fotowishlist} height={280} alt="Card image cap" /></Link>
               </div>
             </div>
             <div className="col-md-6">

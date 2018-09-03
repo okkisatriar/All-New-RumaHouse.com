@@ -12,38 +12,48 @@ class Profile extends Component {
         semualisting:[],
         foto_profile: '',
         namadepan: '',
+        redirect: false,
         alamat_user_admin:''
     }
 
     componentDidMount=()=>{
         var id_user = cookies.get("login");
-        axios.get('http://localhost:8002/dataprofile/' + id_user).then((getData) => 
-        {
-            console.log(getData.data)            
-            this.setState({
-                semualisting: getData.data,
+        if (id_user !== undefined){
+            axios.get('http://localhost:8002/dataprofile/' + id_user).then((getData) => 
+            {
+                console.log(getData.data)            
+                this.setState({
+                    semualisting: getData.data,
+                });
             });
-        });
-
-        var id_username = cookies.get("login");
-        axios.get('http://localhost:8002/data_profile/' + id_username).then((get_Data) => 
+    
+            var id_username = cookies.get("login");
+            axios.get('http://localhost:8002/data_profile/' + id_username).then((get_Data) => 
+            {
+                console.log(get_Data.data)
+                var namadepan = get_Data.data[0].namadepan;
+                var alamat_user_admin = get_Data.data[0].alamat_user_admin;
+                var foto_profile = get_Data.data[0].foto_profile;
+                
+                this.setState({
+                    namadepan: namadepan,
+                    alamat_user_admin : alamat_user_admin,
+                    foto_profile: foto_profile                
+                })  
+            })
+        }
+        else
         {
-            console.log(get_Data.data)
-            var namadepan = get_Data.data[0].namadepan;
-            var alamat_user_admin = get_Data.data[0].alamat_user_admin;
-            var foto_profile = get_Data.data[0].foto_profile;
-            
             this.setState({
-                namadepan: namadepan,
-                alamat_user_admin : alamat_user_admin,
-                foto_profile: foto_profile                
-            })  
-        })
+                redirect : true
+            })
+        }
+        
     }
 
     render() {
 
-    if (cookies.get('login') === undefined)
+    if (this.state.redirect)
     {
       return <Redirect to='/'/>
     }

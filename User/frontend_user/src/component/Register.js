@@ -3,24 +3,58 @@ import {Link, Route} from 'react-router-dom';
 import axios from 'axios';
 
 class Register extends Component {
-  registeruser = (e) =>
-  {
-    axios.post(`http://localhost:8002/registeruser/`,
-      {
-        namadepan: e.namadepan.value,
-        username: e.username.value,
-        email: e.email.value,
-        password: e.password.value,
-        handphone: e.handphone.value,
-        alamat: e.alamat.value
-                
-        // kota: e.kota.value,
-        // negara: e.negara.value
-      }
-      
-    );
 
+  onchange = (e) => 
+    {
+      switch(e.target.name){
+        case 'foto_profile': 
+        this.setState({
+          foto_profile:e.target.files[0]
+        });
+      }
+    }
+
+  registeruser = (e) =>{
+    var namadepan = e.namadepan.value;
+    var username = e.username.value;
+    var email = e.email.value;
+    var password = e.password.value;
+    var handphone = e.handphone.value;
+    var alamat = e.alamat.value;
+    this.setState({
+      namadepan: namadepan,
+      username: username,
+      email: email,
+      password: password,
+      handphone: handphone,
+      alamat: alamat
+    })
   }
+
+  value = (e) =>{
+    e.preventDefault();
+    let formData = new FormData();
+    formData.append('foto_profile',this.state.foto_profile);
+    formData.append('namadepan',this.state.namadepan);
+    formData.append('username',this.state.username);
+    formData.append('email',this.state.email);
+    formData.append('password',this.state.password);
+    formData.append('handphone',this.state.handphone);
+    formData.append('alamat',this.state.alamat);
+
+    axios.post('http://localhost:8002/registeruser/', formData)
+    .then((hasil)=> {
+      console.log(hasil)
+      var respon=hasil.data;
+      if(respon === 1){
+          this.setState({
+              status:true
+          })
+      }
+  })
+}
+
+
   render() {
     return (
       <div>
@@ -32,7 +66,7 @@ class Register extends Component {
               <h3><b>Registrasi</b></h3>
             </div>
             <div className="panel-body">
-              <form>
+              <form onSubmit={this.value} encType="multipart/form-data">
                 <div className="form-row">
                   <div className="form-group col-md-6">
                     <label htmlFor="namadepan">Nama Depan</label>
@@ -60,6 +94,12 @@ class Register extends Component {
                 <div className="form-group">
                   <label htmlFor="inputAddress">Alamat</label>
                   <input type="text" ref="alamat" className="form-control" id="inputAddress" placeholder="Sudirman, Setia Budi" />
+                </div>
+                <div className="form-row">
+                  <div className="form-group col-md-12">
+                    <label>Foto Profile</label>
+                    <input name="foto_profile" onChange={this.onchange} type="file" className="form-control" />
+                  </div>
                 </div>
                 {/* <div className="form-row">
                   <div className="form-group col-md-6">

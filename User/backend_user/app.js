@@ -29,29 +29,58 @@ app.use('/tampungfile', express.static('tampungfile'));
 
 app.post(`/registeruser`, (req,res) =>
 {
-
     var namadepan = req.body.namadepan;
     var username = req.body.username;
     var email = req.body.email;
     var password = req.body.password;
     var handphone = req.body.handphone;
     var alamat = req.body.alamat;
-    var posted = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+    var foto_profile =req.files.foto_profile.name;
     var encrypted = crypto.createHash('sha256' , secret).update(password).digest('hex');
-    var registeruser = `INSERT INTO master_user_admin SET namadepan="${namadepan}",username="${username}",email="${email}",password="${encrypted}",handphone="${handphone}",alamat_user_admin="${alamat}",waktubuat="${posted}"`;
-    dbs.query(registeruser, (err, result) =>
+    var posted = (new Date ((new Date((new Date(new Date())).toISOString() )).getTime() - ((new Date()).getTimezoneOffset()*60000))).toISOString().slice(0, 19).replace('T', ' ');
+    if(namadepan !== '' && username !== '' && email !== '' && password !== '' && handphone !== '' && alamat !== '' && posted !== '' && foto_profile !== '')
     {
-        if (err)
+        var filefoto_profile = req.files.foto_profile;
+    
+
+    filefoto_profile.mv("./tampungfile/" +foto_profile, (err) =>
         {
-            throw err;
-        }
-        else
-        {
-            res.send('Update database sukses')
-            console.log("ada data yg masuk db")
-        }
-    });
-});
+            if (err)
+            {
+                console.log('Foto Profile terupload gagal');
+            } 
+            else
+            {
+                console.log('Foto Profile terupload sukses')
+                var registeruser = `INSERT INTO master_user_admin SET namadepan="${namadepan}",username="${username}",email="${email}",password="${encrypted}",handphone="${handphone}",alamat_user_admin="${alamat}",waktubuat="${posted}",foto_profile="${foto_profile}"`;
+                dbs.query(registeruser, (err, result) =>
+                {
+                    if(err)
+                    {
+                        throw err;
+                    }
+                    else
+                    {
+                        res.send('1');
+                    }
+                })
+            }
+        })
+    }       
+})
+
+//     {
+//         if (err)
+//         {
+//             throw err;
+//         }
+//         else
+//         {
+//             res.send('Update database sukses')
+//             console.log("ada data yg masuk db")
+//         }
+//     });
+// });
 
 app.post('/loginuser', (req, res) =>
 {
@@ -209,10 +238,13 @@ dbs.query(sql, (err,result)=>
     })
 })
 
-app.get('/datawishlist', (req, res) => {
+app.post('/datawishlist', (req, res) => {
+    var id_user = req.body.id_user;
     var sql = ` SELECT table_wishlist.id, table_wishlist.id_produk,table_addproduk.posting, table_addproduk.id, table_addproduk.alamat, table_addproduk.harga,table_addproduk.foto_produk
                 FROM table_wishlist
-                JOIN table_addproduk ON table_wishlist.id_produk=table_addproduk.id`;
+                JOIN table_addproduk ON table_wishlist.id_produk=table_addproduk.id
+                WHERE table_wishlist.id_user = "${id_user}"`;
+    console.log(id_user)
     dbs.query(sql, (err, result) => {
         if(err){
             throw err;

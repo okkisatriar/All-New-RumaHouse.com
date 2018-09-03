@@ -14,7 +14,7 @@ state={
 
     componentWillMount=() =>{
         var id_user = this.props.location.state.id_username;
-        axios.post('http://localhost:8002/dataprofile/' + id_user).then((getData) => {
+        axios.get('http://localhost:8002/dataprofile/' + id_user).then((getData) => {
           console.log(getData.data)
           this.setState({
               semualisting: getData.data,
